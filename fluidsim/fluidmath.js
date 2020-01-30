@@ -1,6 +1,17 @@
+// Fluid Simulation
+// Daniel Shiffman
+// https://thecodingtrain.com/CodingChallenges/132-fluid-simulation.html
+// https://youtu.be/alhpH6ECFvQ
+
+// This would not be possible without:
+// Real-Time Fluid Dynamics for Games by Jos Stam
+// http://www.dgp.toronto.edu/people/stam/reality/Research/pdf/GDC03.pdf
+// Fluid Simulation for Dummies by Mike Ash
+// https://mikeash.com/pyblog/fluid-simulation-for-dummies.html
+
 function diffuse(b, x, x0, diff, dt) {
     let a = dt * diff * (N - 2) * (N - 2);
-    lin_solve(b, x, x0, a, 1 + 6 * a)
+    lin_solve(b, x, x0, a, 1 + 6 * a);
 }
 
 function lin_solve(b, x, x0, a, c) {
@@ -21,7 +32,6 @@ function lin_solve(b, x, x0, a, c) {
         set_bnd(b, x);
     }
 }
-
 function project(velocX, velocY, p, div) {
     for (let j = 1; j < N - 1; j++) {
         for (let i = 1; i < N - 1; i++) {
@@ -51,6 +61,7 @@ function project(velocX, velocY, p, div) {
     set_bnd(2, velocY);
 }
 
+
 function advect(b, d, d0, velocX, velocY, dt) {
     let i0, i1, j0, j1;
 
@@ -60,35 +71,35 @@ function advect(b, d, d0, velocX, velocY, dt) {
     let s0, s1, t0, t1;
     let tmp1, tmp2, x, y;
 
-    let Nlet = N;
-    let ilet, jlet;
+    let Nfloat = N;
+    let ifloat, jfloat;
     let i, j;
 
-    for (j = 1, jlet = 1; j < N - 1; j++ , jlet++) {
-        for (i = 1, ilet = 1; i < N - 1; i++ , ilet++) {
+    for (j = 1, jfloat = 1; j < N - 1; j++ , jfloat++) {
+        for (i = 1, ifloat = 1; i < N - 1; i++ , ifloat++) {
             tmp1 = dtx * velocX[IX(i, j)];
             tmp2 = dty * velocY[IX(i, j)];
-            x = ilet - tmp1;
-            y = jlet - tmp2;
+            x = ifloat - tmp1;
+            y = jfloat - tmp2;
 
             if (x < 0.5) x = 0.5;
-            if (x > Nlet + 0.5) x = Nlet + 0.5;
+            if (x > Nfloat + 0.5) x = Nfloat + 0.5;
             i0 = floor(x);
-            i1 = i0 + 1.0;
+            i1 = i0 + 1;
             if (y < 0.5) y = 0.5;
-            if (y > Nlet + 0.5) y = Nlet + 0.5;
+            if (y > Nfloat + 0.5) y = Nfloat + 0.5;
             j0 = floor(y);
             j1 = j0 + 1.0;
 
             s1 = x - i0;
-            s0 = 1 - s1;
+            s0 = 1.0 - s1;
             t1 = y - j0;
-            t0 = 1 - t1;
+            t0 = 1.0 - t1;
 
-            let i0i = i0;
-            let i1i = i1;
-            let j0i = j0;
-            let j1i = j1;
+            let i0i = int(i0);
+            let i1i = int(i1);
+            let j0i = int(j0);
+            let j1i = int(j1);
 
             // DOUBLE CHECK THIS!!!
             d[IX(i, j)] =
@@ -100,8 +111,9 @@ function advect(b, d, d0, velocX, velocY, dt) {
     set_bnd(b, d);
 }
 
-function set_bnd(b, x) {
 
+
+function set_bnd(b, x) {
     for (let i = 1; i < N - 1; i++) {
         x[IX(i, 0)] = b == 2 ? -x[IX(i, 1)] : x[IX(i, 1)];
         x[IX(i, N - 1)] = b == 2 ? -x[IX(i, N - 2)] : x[IX(i, N - 2)];
@@ -115,5 +127,4 @@ function set_bnd(b, x) {
     x[IX(0, N - 1)] = 0.5 * (x[IX(1, N - 1)] + x[IX(0, N - 2)]);
     x[IX(N - 1, 0)] = 0.5 * (x[IX(N - 2, 0)] + x[IX(N - 1, 1)]);
     x[IX(N - 1, N - 1)] = 0.5 * (x[IX(N - 2, N - 1)] + x[IX(N - 1, N - 2)]);
-
 }
